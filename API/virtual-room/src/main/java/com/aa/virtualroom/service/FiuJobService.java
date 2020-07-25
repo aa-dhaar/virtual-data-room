@@ -5,14 +5,19 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.Optional;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.batch.BatchProperties.Job;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aa.virtualroom.dao.FIUJobRepo;
 import com.aa.virtualroom.exception.FiuBinaryStorageException;
+import com.aa.virtualroom.exception.RecordNotFoundException;
+import com.aa.virtualroom.model.JOB_STATUS;
 import com.aa.virtualroom.model.JobDetails;
 
 @Service
@@ -21,7 +26,7 @@ public class FiuJobService {
 
 	@Autowired
 	FIUJobRepo docStorageRepo;
-	
+
 	@Autowired
 	public FiuJobService(JobDetails jobDetails) {
 		this.fileStorageLocation = Paths.get(jobDetails.getUploadDir())
@@ -55,10 +60,24 @@ public class FiuJobService {
 			//create the object before insert
 			jobDetails.setBinaryName(fileName);
 			jobDetails.setUploadDir(targetLocation.toString());
+			jobDetails.setStatus(JOB_STATUS.CREATED.name());
 			docStorageRepo.save(jobDetails);
-			return fileName;
+			return jobDetails.getJobId().toString();
 		}catch (IOException ex) {
 			throw new FiuBinaryStorageException("Could not store file " + fileName + ". Please try again!", ex);
 		}
 	} 
+
+	public JobDetails getJobDetails(String jobId) throws RecordNotFoundException {
+		JobDetails jobDetail = null;
+		Optional<JobDetails> jobDetails = docStorageRepo.getJobById(UUID.fromString(jobId));
+		if(jobDetails.isPresent()) {
+			jobDetail = jobDetails.get();
+			JobDetails copyToJobDetails = new JobDetails(jobDetail.getJobId(),jobDetail.getFiuInputs(),jobDetail.getBinaryName(),jobDetail.getUploadDir(),jobDetail.getStatus());
+			return copyToJobDetails;
+		}
+		else {
+			throw new RecordNotFoundException("Auction Id is not avilable");
+		}
+	}
 }
