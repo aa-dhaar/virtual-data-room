@@ -5,11 +5,12 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
+import com.aa.virtualroom.model.FuntionDetails;
 import com.aa.virtualroom.model.JobDetails;
 
 @SpringBootApplication
 @EnableConfigurationProperties({
-	JobDetails.class
+	FuntionDetails.class
 })
 public class VirtualRoomApplication {
 

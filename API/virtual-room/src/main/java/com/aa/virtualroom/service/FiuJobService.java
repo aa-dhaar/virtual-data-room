@@ -5,6 +5,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,9 +15,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.aa.virtualroom.dao.FIUFuntionRepo;
 import com.aa.virtualroom.dao.FIUJobRepo;
 import com.aa.virtualroom.exception.FiuBinaryStorageException;
 import com.aa.virtualroom.exception.RecordNotFoundException;
+import com.aa.virtualroom.model.FUNCTION_STATUS;
+import com.aa.virtualroom.model.FuntionDetails;
 import com.aa.virtualroom.model.JOB_STATUS;
 import com.aa.virtualroom.model.JobDetails;
 
@@ -25,11 +29,14 @@ public class FiuJobService {
 	private final Path fileStorageLocation;
 
 	@Autowired
-	FIUJobRepo docStorageRepo;
+	FIUFuntionRepo fiuFuntionRepo;
+	
+	@Autowired
+	FIUJobRepo fiuJobRepo;
 
 	@Autowired
-	public FiuJobService(JobDetails jobDetails) {
-		this.fileStorageLocation = Paths.get(jobDetails.getUploadDir())
+	public FiuJobService(FuntionDetails functionDetails) {
+		this.fileStorageLocation = Paths.get(functionDetails.getUploadDir())
 				.toAbsolutePath().normalize();
 		try {
 			Files.createDirectories(this.fileStorageLocation);
@@ -37,7 +44,7 @@ public class FiuJobService {
 			throw new FiuBinaryStorageException("Could not create the directory where the uploaded files will be stored.", ex);
 		}
 	}
-	public String storeFile(MultipartFile file, JobDetails jobDetails) {
+	public String storeFile(MultipartFile file, FuntionDetails functionDetails) {
 		// Normalize file name
 		String originalFileName = StringUtils.cleanPath(file.getOriginalFilename());
 		String fileName = "";
@@ -52,32 +59,71 @@ public class FiuJobService {
 			} catch(Exception e) {
 				fileExtension = "";
 			}
-			fileName = jobDetails.getRequesterFiu() + "_" + System.currentTimeMillis() + fileExtension;
+			fileName = functionDetails.getRequesterFiu() + "_" + System.currentTimeMillis() + fileExtension;
 			// Copy file to the target location (Replacing existing file with the same name)
 			Path targetLocation = this.fileStorageLocation.resolve(fileName);
 			Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 			//JobDetails jobDetails = new JobDetails();
 			//create the object before insert
-			jobDetails.setBinaryName(fileName);
-			jobDetails.setUploadDir(targetLocation.toString());
-			jobDetails.setStatus(JOB_STATUS.CREATED.name());
-			docStorageRepo.save(jobDetails);
-			return jobDetails.getJobId().toString();
+			functionDetails.setBinaryName(fileName);
+			functionDetails.setUploadDir(targetLocation.toString());
+			functionDetails.setStatus(FUNCTION_STATUS.PENDING.name());
+			fiuFuntionRepo.save(functionDetails);
+			return functionDetails.getFunctionId().toString();
 		}catch (IOException ex) {
 			throw new FiuBinaryStorageException("Could not store file " + fileName + ". Please try again!", ex);
 		}
 	} 
 
+	public FuntionDetails getFunctionDetails(String functionId) throws RecordNotFoundException {
+		FuntionDetails funtionDetail = null;
+		Optional<FuntionDetails> functionDetails = fiuFuntionRepo.findById(UUID.fromString(functionId));
+		if(functionDetails.isPresent()) {
+			funtionDetail = functionDetails.get();
+			FuntionDetails copyToFuntionDetails = new FuntionDetails(funtionDetail.getFunctionId(), funtionDetail.getStatus(), funtionDetail.getRequesterFiu(), funtionDetail.getUploadDir(), funtionDetail.getCreateDate(), funtionDetail.getJsonSchema(), funtionDetail.getBinaryName());
+			return copyToFuntionDetails;
+		}
+		else {
+			throw new RecordNotFoundException("Function is not avilable");
+		}
+	}
+	
+	public List<FuntionDetails> getListOfFunction(){
+		return fiuFuntionRepo.findAll();
+	}
+	
+	
+	public String createJob(String functionId,String aaId) throws RecordNotFoundException {
+		
+		Optional<FuntionDetails> functionDetails = fiuFuntionRepo.findById(UUID.fromString(functionId));
+		
+		if(functionDetails.isPresent()) {
+		JobDetails jobDetails = new JobDetails();
+		jobDetails.setFunctionDetails(functionDetails.get());
+		jobDetails.setAaId(aaId);
+		
+		jobDetails.setStatus(JOB_STATUS.CREATED.name());
+		fiuJobRepo.save(jobDetails);
+		
+		return jobDetails.getJobId().toString();
+		}
+		else {
+        	throw new RecordNotFoundException("function does not exist, Please register function");
+        }
+	}
 	public JobDetails getJobDetails(String jobId) throws RecordNotFoundException {
-		JobDetails jobDetail = null;
-		Optional<JobDetails> jobDetails = docStorageRepo.getJobById(UUID.fromString(jobId));
+		Optional<JobDetails> jobDetails = fiuJobRepo.getJobById(UUID.fromString(jobId));
 		if(jobDetails.isPresent()) {
-			jobDetail = jobDetails.get();
-			JobDetails copyToJobDetails = new JobDetails(jobDetail.getJobId(),jobDetail.getFiuInputs(),jobDetail.getBinaryName(),jobDetail.getUploadDir(),jobDetail.getStatus());
-			return copyToJobDetails;
+			
+			return jobDetails.get();
 		}
 		else {
 			throw new RecordNotFoundException("Auction Id is not avilable");
 		}
 	}
+	
+	public List<JobDetails> getListOfJobs(){
+		return fiuJobRepo.findAll();
+	}
+	
 }
