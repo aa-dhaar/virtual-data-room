@@ -1,0 +1,219 @@
+{
+  "info": {
+    "_postman_id": "ab51d77b-b363-4ad6-8579-3826d65bef53",
+    "name": "AA Virtual Room",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "createFunction",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "function",
+              "description": "Path to the function file",
+              "type": "file",
+              "src": []
+            },
+            {
+              "key": "fiuId",
+              "value": "FIU_ID",
+              "description": "FIU ID returned on registration. In future this could be avoided by using OAuth tokens.",
+              "type": "text"
+            },
+            {
+              "key": "jsonSchema",
+              "value": "{\"jsonSchema\": \"\"}",
+              "description": "Valid JSON Schema which confirms Virtual Data Room requirements",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "/vdr/createFunction",
+          "path": [
+            "vdr",
+            "createFunction"
+          ]
+        },
+        "description": "Use this API to create a new Function for the FIU. The FIU is expected to poll the getFunctionDetails API to check status of the Function before requesting a new Job."
+      },
+      "response": [
+        {
+          "name": "default",
+          "status": "Accepted",
+          "code": 202,
+          "header": [
+          ],
+          "body": "{\n  \"functionId\": \"FUNCTION_ID\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "getFunctionsByFiuId",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "/vdr/getFunctionsByFiuId?fiuId=FIU_ID",
+          "path": [
+            "vdr",
+            "getFunctionsByFiuId"
+          ],
+          "query": [
+            {
+              "key": "fiuId",
+              "value": "FIU_ID",
+              "description": "FIU ID returned on registration. In future this could be avoided by using OAuth tokens."
+            }
+          ]
+        },
+        "description": "Use this API to get a list of all the Functions created by the FIU."
+      },
+      "response": [
+        {
+          "name": "default",
+          "status": "OK",
+          "code": 200,
+          "header": [
+          ],
+          "body": "{\n  \"fiuId\": \"FIU_ID\",\n  \"functions\": {\n    \"FUNCTION1_ID\": {\n      \"functionId\": \"FUNCTION1_ID\",\n      \"jsonSchema\": \"\",\n      \"state\": \"AVAILABLE\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    },\n    \"FUNCTION2_ID\": {\n      \"functionId\": \"FUNCTION2_ID\",\n      \"jsonSchema\": \"\",\n      \"state\": \"UNAVAILABLE\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    },\n    \"FUNCTION3_ID\": {\n      \"functionId\": \"FUNCTION3_ID\",\n      \"jsonSchema\": \"\",\n      \"state\": \"FAILED\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "getFunctionDetails",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "/vdr/getFunctionDetails?functionId=FUNCTION_ID",
+          "path": [
+            "vdr",
+            "getFunctionDetails"
+          ],
+          "query": [
+            {
+              "key": "functionId",
+              "value": "FUNCTION_ID",
+              "description": "FUNCTION_ID returned by the createFunction API"
+            }
+          ]
+        },
+        "description": "Use this API to get details of a particular Function given an ID of the Function."
+      },
+      "response": [
+        {
+          "name": "default",
+          "status": "OK",
+          "code": 200,
+          "header": [
+          ],
+          "body": "{\n  \"fiuId\": \"FIU_ID\",\n  \"functions\": {\n    \"FUNCTION_ID\": {\n      \"functionId\": \"FUNCTION1_ID\",\n      \"jsonSchema\": \"\",\n      \"state\": \"AVAILABLE\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "createJob",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"fiuId\": \"FIU_ID\",\n    \"functionId\": \"FUNCTION_ID\",\n    \"aaId\": \"superstar@awesomeAA\",\n    \"requestParams\": \"{\\\"aaId\\\": \\\"superstart@awesomeAA\\\"}\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "/vdr/createJob",
+          "path": [
+            "vdr",
+            "createJob"
+          ]
+        },
+        "description": "Use this API to create a new Job for a particular Function for a  particular user with a AA ID. The FIU is expected to poll the getFunctionDetails API to check status of the Function before requesting a new Job."
+      },
+      "response": [
+        {
+          "name": "default",
+          "status": "Accepted",
+          "code": 202,
+          "header": [
+          ],
+          "body": "{\n  \"jobId\": \"JOB_ID\"\n}"
+        }
+      ]
+    },
+    {
+      "name": "getJobsByFiuId",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "/vdr/getJobsByFiuId?fiuId=FIU_ID",
+          "path": [
+            "vdr",
+            "getJobsByFiuId"
+          ],
+          "query": [
+            {
+              "key": "fiuId",
+              "value": "FIU_ID",
+              "description": "FIU ID returned on registration. In future this could be avoided by using OAuth tokens."
+            }
+          ]
+        },
+        "description": "Use this API to get a list of all the Jobs requested by the FIU."
+      },
+      "response": [
+        {
+          "status": "OK",
+          "code": 200,
+          "header": [
+          ],
+          "body": "{\n  \"fiuId\": \"FIU_ID\",\n  \"jobs\": {\n    \"JOB1_ID\": {\n      \"jobId\": \"JOB1_ID\",\n      \"functionId\": \"FUNCTION1_ID\",\n      \"aaId\": \"AA1_ID\",\n      \"state\": \"CREATED\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    },\n    \"JOB2_ID\": {\n      \"jobId\": \"JOB2_ID\",\n      \"functionId\": \"FUNCTION2_ID\",\n      \"aaId\": \"AA1_ID\",\n      \"state\": \"PROCESSING\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    },\n    \"JOB3_ID\": {\n      \"jobId\": \"JOB3_ID\",\n      \"functionId\": \"FUNCTION1_ID\",\n      \"aaId\": \"AA2_ID\",\n      \"state\": \"FAILED\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    }\n  }\n}"
+        }
+      ]
+    },
+    {
+      "name": "getJobDetails",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "/vdr/getFunctionDetails?jobId=JOB_ID",
+          "path": [
+            "vdr",
+            "getFunctionDetails"
+          ],
+          "query": [
+            {
+              "key": "jobId",
+              "value": "JOB_ID",
+              "description": "JOB_ID returned by the createJob API"
+            }
+          ]
+        },
+        "description": "Use this API to get details of a particular Job given an ID of the Job."
+      },
+      "response": [
+        {
+          "name": "default",
+          "status": "OK",
+          "code": 200,
+          "header": [
+          ],
+          "body": "{\n  \"fiuId\": \"FIU_ID\",\n  \"jobs\": {\n    \"JOB1_ID\": {\n      \"jobId\": \"JOB1_ID\",\n      \"functionId\": \"FUNCTION1_ID\",\n      \"aaId\": \"AA1_ID\",\n      \"state\": \"SUCCESS\",\n      \"result\": \"{ \\\"data\\\": { \\\"canProvideLoan\\\": true } }\",\n      \"created\": \"UTC DateTime String\",\n      \"lastUpdated\": \"UTC DateTime String\"\n    }\n  }\n}\n"
+        }
+      ]
+    }
+  ],
+  "protocolProfileBehavior": {}
+}

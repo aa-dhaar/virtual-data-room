@@ -1,0 +1,761 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>AA Virtual Room</title>
+    <link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/styles/monokai-sublime.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/9.12.0/highlight.min.js"></script>
+    <script>
+        hljs.configure({
+            tabReplace: '    ',
+        });
+        hljs.initHighlightingOnLoad();
+    </script>
+    <style>body {
+    position: relative;
+}
+
+h1 {
+    margin-top: 5px;
+}
+
+h1, h2, h3, h4 {
+    color: #2b2b2b;
+}
+
+h2:after {
+    content: ' ';
+}
+
+h5 {
+    font-weight: bold;
+}
+
+h1 a, h2 a, h3 a, h4 a, h5 a, h6 a {
+    display: none;
+    position: absolute;
+    margin-left: 8px;
+}
+
+h1:hover a, h2:hover a, h3:hover a, h4:hover a, h5:hover a, h6:hover a {
+    color: #a5a5a5;
+    display: initial;
+}
+
+.nav.nav-tabs > li > a {
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+.tab-content {
+    padding-top: 8px;
+}
+
+.table {
+    margin-bottom: 8px;
+}
+
+pre {
+    border-radius: 0px;
+    border: none;
+}
+
+pre code {
+    margin: -9.5px;
+}
+
+.request {
+    margin-top: 12px;
+    margin-bottom: 24px;
+}
+
+.response-text-sample {
+    padding: 0px !important;
+}
+
+.response-text-sample pre {
+    margin-bottom: 0px;
+}
+
+
+#sidebar-wrapper {
+    z-index: 1000;
+    position: fixed;
+    left: 250px;
+    width: 250px;
+    height: 100%;
+    margin-left: -250px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    background: #2b2b2b;
+    padding-top: 20px;
+}
+
+#sidebar-wrapper ul {
+    width: 250px;
+}
+
+#sidebar-wrapper ul li {
+    margin-right: 10px;
+}
+
+#sidebar-wrapper ul li a:hover {
+    background: inherit;
+    text-decoration: none;
+}
+
+#sidebar-wrapper ul li a {
+    display: block;
+    color: #ECF0F1;
+    padding: 6px 15px;
+}
+
+#sidebar-wrapper ul li ul {
+    padding-left: 25px;
+}
+
+#sidebar-wrapper ul li ul li a {
+    padding: 1px 0px;
+}
+
+#sidebar-wrapper ul li a:hover,
+#sidebar-wrapper ul li a:focus {
+    color: #e0c46c;
+    border-right: solid 1px #e0c46c;
+}
+
+#sidebar-wrapper ul li.active > a {
+    color: #e0c46c;
+    border-right: solid 3px #e0c46c;
+}
+
+#sidebar-wrapper ul li:not(.active) ul {
+    display: none;
+}
+
+#page-content-wrapper {
+    width: 100%;
+    position: absolute;
+    padding: 15px 15px 15px 250px;
+}
+</style>
+</head>
+<body data-spy="scroll" data-target=".scrollspy">
+<div id="sidebar-wrapper">
+    <div class="scrollspy">
+    <ul id="main-menu" data-spy="affix" class="nav">
+        <li>
+            <a href="#doc-general-notes">General notes</a>
+        </li>
+        
+        <li>
+            <a href="#doc-api-detail">API detail</a>
+        </li>
+        
+        <li>
+            <a href="#request-createfunction">createFunction</a>
+        </li>
+        
+        <li>
+            <a href="#request-getfunctionsbyfiuid">getFunctionsByFiuId</a>
+        </li>
+        
+        <li>
+            <a href="#request-getfunctiondetails">getFunctionDetails</a>
+        </li>
+        
+        <li>
+            <a href="#request-createjob">createJob</a>
+        </li>
+        
+        <li>
+            <a href="#request-getjobsbyfiuid">getJobsByFiuId</a>
+        </li>
+        
+        <li>
+            <a href="#request-getjobdetails">getJobDetails</a>
+        </li>
+        
+        
+    </ul>
+</div>
+
+</div>
+<div id="page-content-wrapper">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-lg-12">
+                <h1>AA Virtual Room</h1>
+
+                <h2 id="doc-general-notes">
+                    General notes
+                    <a href="#doc-general-notes"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                
+
+                
+
+                <h2 id="doc-api-detail">
+                    API detail
+                    <a href="#doc-api-detail"><i class="glyphicon glyphicon-link"></i></a>
+                </h2>
+
+                
+                
+                <div class="request">
+
+                    <h3 id="request-createfunction">
+                        createFunction
+                        <a href="#request-createfunction"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to create a new Function for the FIU. The FIU is expected to poll the getFunctionDetails API to check status of the Function before requesting a new Job.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-createfunction-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-createfunction-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-createfunction-example-curl">
+                                <pre><code class="hljs curl">curl --location --request POST '/vdr/createFunction'
+--form 'function=@/path/to/file'
+--form 'fiuId=FIU_ID'
+--form 'jsonSchema={\"jsonSchema\": \"\"}'</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-createfunction-example-node">
+                                <pre><code class="hljs code">var request = require('request');
+var fs = require('fs');
+var options = {
+  'method': 'POST',
+  'url': '/vdr/createFunction',
+  'headers': {
+  },
+  formData: {
+    'function': {
+      'value': fs.createReadStream('/path/to/file'),
+      'options': {
+        'filename': 'filename'
+        'contentType': null
+      }
+    },
+    'fiuId': 'FIU_ID',
+    'jsonSchema': '{"jsonSchema": ""}'
+  }
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-createfunction-responses-80a2ceda-a049-4479-b5c8-2330ce2c2d90" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-createfunction-responses-80a2ceda-a049-4479-b5c8-2330ce2c2d90">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>202 Accepted</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "functionId": "FUNCTION_ID"
+}</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+                
+                <div class="request">
+
+                    <h3 id="request-getfunctionsbyfiuid">
+                        getFunctionsByFiuId
+                        <a href="#request-getfunctionsbyfiuid"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to get a list of all the Functions created by the FIU.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-getfunctionsbyfiuid-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-getfunctionsbyfiuid-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-getfunctionsbyfiuid-example-curl">
+                                <pre><code class="hljs curl">curl -X GET "/vdr/getFunctionsByFiuId?fiuId=FIU_ID"</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-getfunctionsbyfiuid-example-node">
+                                <pre><code class="hljs node">var request = require('request');
+var options = {
+  'method': 'GET',
+  'url': '/vdr/getFunctionsByFiuId?fiuId=FIU_ID',
+  'headers': {
+  }
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-getfunctionsbyfiuid-responses-828915c2-17df-4e29-9b06-cf266598021b" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-getfunctionsbyfiuid-responses-828915c2-17df-4e29-9b06-cf266598021b">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "fiuId": "FIU_ID",
+    "functions": {
+        "FUNCTION1_ID": {
+            "functionId": "FUNCTION1_ID",
+            "jsonSchema": "",
+            "state": "AVAILABLE",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        },
+        "FUNCTION2_ID": {
+            "functionId": "FUNCTION2_ID",
+            "jsonSchema": "",
+            "state": "UNAVAILABLE",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        },
+        "FUNCTION3_ID": {
+            "functionId": "FUNCTION3_ID",
+            "jsonSchema": "",
+            "state": "FAILED",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        }
+    }
+}</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+                
+                <div class="request">
+
+                    <h3 id="request-getfunctiondetails">
+                        getFunctionDetails
+                        <a href="#request-getfunctiondetails"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to get details of a particular Function given an ID of the Function.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-getfunctiondetails-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-getfunctiondetails-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-getfunctiondetails-example-curl">
+                                <pre><code class="hljs curl">curl -X GET "/vdr/getFunctionDetails?functionId=FUNCTION_ID"</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-getfunctiondetails-example-node">
+                                <pre><code class="hljs node">var request = require('request');
+var options = {
+  'method': 'GET',
+  'url': '/vdr/getFunctionDetails?functionId=FUNCTION_ID',
+  'headers': {
+  }
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-getfunctiondetails-responses-79e18cd7-7b52-4449-85df-8f90ac0d51b3" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-getfunctiondetails-responses-79e18cd7-7b52-4449-85df-8f90ac0d51b3">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "fiuId": "FIU_ID",
+    "functions": {
+        "FUNCTION_ID": {
+            "functionId": "FUNCTION1_ID",
+            "jsonSchema": "",
+            "state": "AVAILABLE",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        }
+    }
+}</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+                
+                <div class="request">
+
+                    <h3 id="request-createjob">
+                        createJob
+                        <a href="#request-createjob"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to create a new Job for a particular Function for a  particular user with a AA ID. The FIU is expected to poll the getFunctionDetails API to check status of the Function before requesting a new Job.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-createjob-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-createjob-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-createjob-example-curl">
+                                <pre><code class="hljs curl">curl -X POST -d '{
+    "fiuId": "FIU_ID",
+    "functionId": "FUNCTION_ID",
+    "aaId": "superstar@awesomeAA",
+    "requestParams": "{\"aaId\": \"superstart@awesomeAA\"}"
+}' "/vdr/createJob"</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-createjob-example-node">
+                                <pre><code class="hljs node">var request = require('request');
+var options = {
+  'method': 'POST',
+  'url': '/vdr/createJob',
+  'headers': {
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify({"fiuId":"FIU_ID","functionId":"FUNCTION_ID","aaId":"superstar@awesomeAA","requestParams":"{\"aaId\": \"superstart@awesomeAA\"}"})
+
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-createjob-responses-8a0f01f7-9d35-4f9d-8dc5-dc572727fc91" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-createjob-responses-8a0f01f7-9d35-4f9d-8dc5-dc572727fc91">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>202 Accepted</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "jobId": "JOB_ID"
+}</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+                
+                <div class="request">
+
+                    <h3 id="request-getjobsbyfiuid">
+                        getJobsByFiuId
+                        <a href="#request-getjobsbyfiuid"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to get a list of all the Jobs requested by the FIU.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-getjobsbyfiuid-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-getjobsbyfiuid-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-getjobsbyfiuid-example-curl">
+                                <pre><code class="hljs curl">curl -X GET "/vdr/getJobsByFiuId?fiuId=FIU_ID"</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-getjobsbyfiuid-example-node">
+                                <pre><code class="hljs node">var request = require('request');
+var options = {
+  'method': 'GET',
+  'url': '/vdr/getJobsByFiuId?fiuId=FIU_ID',
+  'headers': {
+  }
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-getjobsbyfiuid-responses-c2ca232f-af9f-4121-b812-e03847fcd912" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-getjobsbyfiuid-responses-c2ca232f-af9f-4121-b812-e03847fcd912">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "fiuId": "FIU_ID",
+    "jobs": {
+        "JOB1_ID": {
+            "jobId": "JOB1_ID",
+            "functionId": "FUNCTION1_ID",
+            "aaId": "AA1_ID",
+            "state": "CREATED",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        },
+        "JOB2_ID": {
+            "jobId": "JOB2_ID",
+            "functionId": "FUNCTION2_ID",
+            "aaId": "AA1_ID",
+            "state": "PROCESSING",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        },
+        "JOB3_ID": {
+            "jobId": "JOB3_ID",
+            "functionId": "FUNCTION1_ID",
+            "aaId": "AA2_ID",
+            "state": "FAILED",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        }
+    }
+}</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+                
+                <div class="request">
+
+                    <h3 id="request-getjobdetails">
+                        getJobDetails
+                        <a href="#request-getjobdetails"><i class="glyphicon glyphicon-link"></i></a>
+                    </h3>
+
+                    <div><p>Use this API to get details of a particular Job given an ID of the Job.</p>
+</div>
+
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            <li role="presentation" class="active"><a href="#request-getjobdetails-example-curl" data-toggle="tab">Curl</a></li>
+                            <li role="presentation"><a href="#request-getjobdetails-example-node" data-toggle="tab">Node.js</a></li>
+                        </ul>
+                        <div class="tab-content">
+                            <div class="tab-pane active" id="request-getjobdetails-example-curl">
+                                <pre><code class="hljs curl">curl -X GET "/vdr/getFunctionDetails?jobId=JOB_ID"</code></pre>
+                            </div>
+                            <div class="tab-pane" id="request-getjobdetails-example-node">
+                                <pre><code class="hljs node">var request = require('request');
+var options = {
+  'method': 'GET',
+  'url': '/vdr/getFunctionDetails?jobId=JOB_ID',
+  'headers': {
+  }
+};
+request(options, function (error, response) {
+  if (error) throw new Error(error);
+  console.log(response.body);
+});</code></pre>
+                            </div>
+                        </div>
+                    </div>
+
+                    
+                    <div>
+                        <ul class="nav nav-tabs" role="tablist">
+                            
+                            <li role="presentation" class="active">
+                                <a href="#request-getjobdetails-responses-13ecab44-e06b-4426-8b7f-aa4739f1acfc" data-toggle="tab">
+                                    
+                                    Response
+                                    
+                                </a>
+                            </li>
+                            
+                        </ul>
+                        <div class="tab-content">
+                            
+                            <div class="tab-pane active" id="request-getjobdetails-responses-13ecab44-e06b-4426-8b7f-aa4739f1acfc">
+                                <table class="table table-bordered">
+                                    <tr><th style="width: 20%;">Status</th><td>200 OK</td></tr>
+                                    
+                                    
+                                    
+                                    <tr><td class="response-text-sample" colspan="2">
+                                        <pre><code>{
+    "fiuId": "FIU_ID",
+    "jobs": {
+        "JOB1_ID": {
+            "jobId": "JOB1_ID",
+            "functionId": "FUNCTION1_ID",
+            "aaId": "AA1_ID",
+            "state": "SUCCESS",
+            "result": "{ \"data\": { \"canProvideLoan\": true } }",
+            "created": "UTC DateTime String",
+            "lastUpdated": "UTC DateTime String"
+        }
+    }
+}
+</code></pre>
+                                    </td></tr>
+                                    
+                                    
+                                </table>
+                            </div>
+                            
+                        </div>
+                    </div>
+                    
+
+                    <hr>
+                </div>
+                
+
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-2.2.2.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script>
+    $(document).ready(function() {
+        $("table:not(.table)").addClass('table table-bordered');
+    });
+</script>
+</body>
+</html>
