@@ -123,6 +123,12 @@ Resources:
       Port: 80
       Protocol: HTTP
 
+  LambdaSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Access to the Scheduler and Callback Lambdas
+      VpcId: !Ref 'VPC'
+
   ECSCluster:
     Type: AWS::ECS::Cluster
 
@@ -251,6 +257,14 @@ Resources:
       GroupId: !Ref 'DBSecurityGroup'
       IpProtocol: -1
       SourceSecurityGroupId: !Ref 'ECSSecurityGroup'
+
+  DBSecurityGroupIngressFromLambda:
+    Type: AWS::EC2::SecurityGroupIngress
+    Properties:
+      Description: Ingress from the Lambda to the RDS instance
+      GroupId: !Ref 'DBSecurityGroup'
+      IpProtocol: -1
+      SourceSecurityGroupId: !Ref 'LambdaSecurityGroup'
 
 Outputs:
   PrivateSubnetOne:
