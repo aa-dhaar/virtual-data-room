@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -20,14 +21,17 @@ import java.util.*;
 @Service
 public class FiuFunctionService {
 
-    private static final Path FILE_STORAGE_LOCATION =
-        Paths.get("/Users/palash/Documents/code/virtual-data-room/uploads");
+    private static final String FILE_STORAGE_LOCATION = Paths.get("").toAbsolutePath().toString() + "/target/uploads";
 
     @Autowired
     FiuFunctionRepo fiuFunctionRepo;
 
     @Autowired
     public FiuFunctionService() {
+        File directory = new File(FILE_STORAGE_LOCATION);
+        if (!directory.exists()) {
+            directory.mkdir();
+        }
     }
 
     public String createFunction(MultipartFile file, FunctionDetails functionDetails) {
@@ -40,18 +44,10 @@ public class FiuFunctionService {
                 throw new FiuBinaryStorageException(
                     "Sorry! Filename contains invalid path sequence " + originalFileName);
             }
-            String fileExtension = "";
-            try {
-                fileExtension = originalFileName.substring(originalFileName.lastIndexOf("."));
-            } catch (Exception e) {
-                fileExtension = "";
-            }
-            fileName = functionDetails.getFiuId() + "_" +
-                       functionDetails.getFunctionId() + "_" +
-                       System.currentTimeMillis() + fileExtension;
+            fileName = functionDetails.getFiuId() + "_" + System.currentTimeMillis() + "_" + originalFileName;
 
             // Copy file to the target location (Replacing existing file with the same name)
-            Path targetLocation = FILE_STORAGE_LOCATION.resolve(fileName);
+            Path targetLocation = Paths.get(FILE_STORAGE_LOCATION).resolve(fileName);
             Files.copy(file.getInputStream(), targetLocation, StandardCopyOption.REPLACE_EXISTING);
 
             //create the object before insert
