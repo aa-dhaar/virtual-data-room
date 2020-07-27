@@ -1,196 +1,174 @@
 package com.aa.virtualroom.model;
 
-import java.util.Date;
-import java.util.Set;
-import java.util.UUID;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
 import org.hibernate.annotations.Parameter;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
+import java.util.Date;
+import java.util.UUID;
 
-//@ConfigurationProperties(prefix = "file")
+import javax.persistence.*;
+
 @Entity
-@Table(name = "job_deteails")
+@Table(name = "jobs")
 public class JobDetails {
 
+    public JobDetails() {
+        super();
+    }
 
+    public JobDetails(UUID jobId, UUID fiuId, UUID functionId, Date createDate, Date lastUpdateDate,
+                      JobState state, int retry, String aaId, String requestParams, String result) {
+        super();
+        this.jobId = jobId;
+        this.fiuId = fiuId;
+        this.functionId = functionId;
+        this.createDate = createDate;
+        this.lastUpdateDate = lastUpdateDate;
+        this.state = state.name();
+        this.requestParams = requestParams;
+        this.retry = retry;
+        this.aaId = aaId;
+        this.result = result;
+    }
 
-	public JobDetails() {
-		super();
-	}
+    @Id
+    @GeneratedValue(generator = "UUID")
+    @GenericGenerator(
+        name = "UUID",
+        strategy = "org.hibernate.id.UUIDGenerator",
+        parameters = {
+            @Parameter(
+                name = "uuid_gen_strategy_class",
+                value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
+            )
+        }
+    )
+    @Column(name = "id", updatable = false, nullable = false)
+    private UUID jobId;
 
-	
+    @Column(name = "fiu_id", updatable = false, nullable = false)
+    private UUID fiuId;
 
-	public JobDetails(UUID jobId, Date createDate, Date lastUpdateDate, Date jobPickupDateTime, String status,
-			int retry, FuntionDetails functionDetails, String aaId, String result) {
-		super();
-		this.jobId = jobId;
-		this.createDate = createDate;
-		this.lastUpdateDate = lastUpdateDate;
-		this.jobPickupDateTime = jobPickupDateTime;
-		this.status = status;
-		this.retry = retry;
-		this.functionDetails = functionDetails;
-		this.aaId = aaId;
-		this.result = result;
-	}
+    @Column(name = "function_id", updatable = false, nullable = false)
+    private UUID functionId;
 
+    @Column(name = "state", nullable = false)
+    private String state;
 
+    @Column(name = "retry_count", nullable = false)
+    private int retry;
 
-	@Id
-	@GeneratedValue(generator = "UUID")
-	@GenericGenerator(
-			name = "UUID",
-			strategy = "org.hibernate.id.UUIDGenerator",
-			parameters = {
-					@Parameter(
-							name = "uuid_gen_strategy_class",
-							value = "org.hibernate.id.uuid.CustomVersionOneStrategy"
-							)
-			}
-			)
-	@Column(name = "job_id", updatable = false, nullable = false)
-	private UUID  jobId;
+    @Column(name = "aa_id", nullable = false)
+    private String aaId;
 
-	
+    @Column(name = "request_params")
+    private String requestParams;
 
+    @Column(name = "result")
+    private String result;
 
+    @Column(name = "created", nullable = false, updatable = false)
+    @CreationTimestamp
+    private Date createDate;
 
+    @Column(name = "last_updated")
+    @UpdateTimestamp
+    private Date lastUpdateDate;
 
+    @Transient
+    private FunctionDetails functionDetails;
 
-	/*
-	 * @Column(name = "binary_format") private String binaryFormat;
-	 */
+    public UUID getJobId() {
+        return jobId;
+    }
 
+    public void setJobId(UUID jobId) {
+        this.jobId = jobId;
+    }
 
+    public UUID getFiuId() {
+        return fiuId;
+    }
 
-	@Column(nullable = false, updatable = false)
-	@CreationTimestamp
-	private Date createDate;
-	//create time,pick up time
+    public void setFiuId(UUID fiuId) {
+        this.fiuId = fiuId;
+    }
 
-	@Column(name = "last_updated_date_time")
-	private Date lastUpdateDate;
+    public UUID getFunctionId() {
+        return functionId;
+    }
 
-	@Column(name = "job_start_date_time")
-	private Date jobPickupDateTime;
+    public void setFunctionId(UUID functionId) {
+        this.functionId = functionId;
+    }
 
-	@Column(name = "status")
-	private String status;
+    public Date getCreateDate() {
+        return createDate;
+    }
 
-	@Column(name = "retry")
-	private int retry;
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
 
-	@ManyToOne(fetch = FetchType.LAZY, optional = false)
-    @JoinColumn(name = "function_id", nullable = false)
-    @OnDelete(action = OnDeleteAction.CASCADE)
-    @JsonIgnore
-    private FuntionDetails functionDetails;
+    public Date getLastUpdateDate() {
+        return lastUpdateDate;
+    }
 
-	@Column(name = "aaId")
-	private String aaId;
+    public void setLastUpdateDate(Date lastUpdateDate) {
+        this.lastUpdateDate = lastUpdateDate;
+    }
 
-	@Column(name = "result")
-	private String result;
+    public String getState() {
+        return state;
+    }
 
+    public void setState(String state) {
+        this.state = state;
+    }
 
-	public UUID getJobId() {
-		return jobId;
-	}
+    public int getRetry() {
+        return retry;
+    }
 
-	public void setJobId(UUID jobId) {
-		this.jobId = jobId;
-	}
+    public void setRetry(int retry) {
+        this.retry = retry;
+    }
 
-	
+    public String getAaId() {
+        return aaId;
+    }
 
+    public void setAaId(String aaId) {
+        this.aaId = aaId;
+    }
 
+    public String getResult() {
+        return result;
+    }
 
+    public void setResult(String result) {
+        this.result = result;
+    }
 
+    public String getRequestParams() {
+        return requestParams;
+    }
 
+    public void setRequestParams(String requestParams) {
+        this.requestParams = requestParams;
+    }
 
+    public FunctionDetails getFunctionDetails() {
+        return functionDetails;
+    }
 
-	public Date getCreateDate() {
-		return createDate;
-	}
-
-	public void setCreateDate(Date createDate) {
-		this.createDate = createDate;
-	}
-
-	public Date getLastUpdateDate() {
-		return lastUpdateDate;
-	}
-
-	public void setLastUpdateDate(Date lastUpdateDate) {
-		this.lastUpdateDate = lastUpdateDate;
-	}
-
-	public Date getJobPickupDateTime() {
-		return jobPickupDateTime;
-	}
-
-	public void setJobPickupDateTime(Date jobPickupDateTime) {
-		this.jobPickupDateTime = jobPickupDateTime;
-	}
-
-	public String getStatus() {
-		return status;
-	}
-
-	public void setStatus(String status) {
-		this.status = status;
-	}
-
-	public int getRetry() {
-		return retry;
-	}
-
-	public void setRetry(int retry) {
-		this.retry = retry;
-	}
-
-	public String getAaId() {
-		return aaId;
-	}
-
-	public void setAaId(String aaId) {
-		this.aaId = aaId;
-	}
-
-	public String getResult() {
-		return result;
-	}
-
-	public void setResult(String result) {
-		this.result = result;
-	}
-
-	public FuntionDetails getFunctionDetails() {
-		return functionDetails;
-	}
-
-	public void setFunctionDetails(FuntionDetails functionDetails) {
-		this.functionDetails = functionDetails;
-	}
-
-
+    public void setFunctionDetails(FunctionDetails functionDetails) {
+        this.functionDetails = functionDetails;
+        this.setFiuId(functionDetails.getFiuId());
+        this.setFunctionId(functionDetails.getFunctionId());
+    }
 
 
 }
