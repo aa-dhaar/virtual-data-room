@@ -57,7 +57,7 @@ public class FunctionDetails {
     @Column(name = "state", nullable = false)
     private String state;
 
-    @Column(name = "s3_location", nullable = false)
+    @Column(name = "s3_location")
     private String s3Location;
 
     @Column(name = "result_json_schema", nullable = false)
