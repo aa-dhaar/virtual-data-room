@@ -32,7 +32,7 @@ import java.util.*;
 public class FiuFunctionService {
 
     private static final String FILE_STORAGE_LOCATION = Paths.get("").toAbsolutePath().toString() + "/target/uploads";
-    private static final String BUCKET_NAME = "aa-dhaar-api";
+    private static final String BUCKET_NAME = "788726710547-fiu-lambdas-us-east-1";
 
     @Autowired
     FiuFunctionRepo fiuFunctionRepo;
