@@ -57,11 +57,20 @@ public class FunctionDetails {
     @Column(name = "state", nullable = false)
     private String state;
 
-    @Column(name = "s3_location")
+    @Column(name = "s3_location", nullable = false)
     private String s3Location;
 
     @Column(name = "result_json_schema", nullable = false)
     private String jsonSchema;
+    
+    @Column(name = "function_description")
+    private String functionDescription;
+    
+    @Column(name = "handler",nullable = false)
+    private String handler;
+    
+    @Column(name = "runtime",nullable = false)
+    private String runtime;
 
     @Column(name = "created", nullable = false, updatable = false)
     @CreationTimestamp
@@ -135,4 +144,33 @@ public class FunctionDetails {
         this.functionName = functionName;
     }
 
+	public String getFunctionDescription() {
+		return functionDescription;
+	}
+
+	public void setFunctionDescription(String functionDescription) {
+		this.functionDescription = functionDescription;
+	}
+
+	public String getHandler() {
+		return handler;
+	}
+
+	public void setHandler(String handler) {
+		this.handler = handler;
+	}
+
+	public String getRuntime() {
+		return runtime;
+	}
+
+	public void setRuntime(String runtime) {
+		this.runtime = runtime;
+	}
+
+	public void setFiuId(UUID fiuId) {
+		this.fiuId = fiuId;
+	}
+
+    
 }

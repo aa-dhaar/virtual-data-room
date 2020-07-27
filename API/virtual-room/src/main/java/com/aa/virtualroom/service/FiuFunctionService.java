@@ -47,7 +47,14 @@ public class FiuFunctionService {
     public FiuFunctionService() {
         File directory = new File(FILE_STORAGE_LOCATION);
         if (!directory.exists()) {
-            directory.mkdir();
+        	try {
+    			Files.createDirectories(directory.toPath());
+    		} catch (Exception ex) {
+    			throw new FiuBinaryStorageException("Could not create the directory where the uploaded files will be stored.", ex);
+    		}
+        }
+        else {
+        	System.out.println(directory.toPath());
         }
     }
 
@@ -62,7 +69,7 @@ public class FiuFunctionService {
                     "Sorry! Filename contains invalid path sequence " + originalFileName);
             }
             fileName = functionDetails.getFiuId() + "_" + System.currentTimeMillis() + "_" + originalFileName;
-
+            
             // Copy file to the target location (Replacing existing file with the same name)
             Path targetLocation = Paths.get(FILE_STORAGE_LOCATION).resolve(fileName);
             try (OutputStream os = Files.newOutputStream(targetLocation)) {
@@ -70,14 +77,13 @@ public class FiuFunctionService {
             }
 
             //create the object before insert
-            functionDetails.setFunctionName(fileName);
-            
+            functionDetails.setS3Location(BUCKET_NAME+"/"+functionDetails.getFiuId().toString()+"/"+fileName);
             functionDetails.setState(FunctionState.PENDING.name());
             fiuFunctionRepo.save(functionDetails);
-            functionDetails.setS3Location(uploadToS3(targetLocation.toFile(),functionDetails.getFiuId().toString(), originalFileName));
+            uploadToS3(targetLocation.toFile(),functionDetails.getFiuId().toString(), fileName);
             
             Files.delete(targetLocation);
-            fiuFunctionRepo.save(functionDetails);
+            //fiuFunctionRepo.save(functionDetails);
             return functionDetails.getFunctionId().toString();
         } catch (IOException ex) {
             throw new FiuBinaryStorageException("Could not store file " + fileName + ". Please try again!", ex);
@@ -105,13 +111,13 @@ public class FiuFunctionService {
     			  .withCredentials(new AWSStaticCredentialsProvider(credentials))
     			  .withRegion(Regions.US_EAST_1)
     			  .build();
-    	if(!s3client.doesBucketExist(BUCKET_NAME)) {
-    		s3client.createBucket(fiuId);
-    		System.out.println("Bucket Created");
-    	}
-    	String s3FileName = fiuId+ "_" + System.currentTimeMillis() + "_" + originalFileName;
+		/*
+		 * if(!s3client.doesBucketExist(BUCKET_NAME)) { s3client.createBucket(fiuId);
+		 * System.out.println("Bucket Created"); }
+		 */
+    	String s3FileName = fiuId+ "/" + originalFileName;
     	s3client.putObject(
-    			fiuId, 
+    			BUCKET_NAME, 
     			s3FileName, 
     			 fileName
     			);
