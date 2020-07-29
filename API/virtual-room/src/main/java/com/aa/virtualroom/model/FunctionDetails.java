@@ -51,31 +51,25 @@ public class FunctionDetails {
     @Column(name = "fiu_id", updatable = false, nullable = false)
     private UUID fiuId;
 
-    @Lob
-    @Column(name = "function_name", nullable = false)
+    @Column(name = "function_name", nullable = false,length = 1000)
     private String functionName;
 
     @Column(name = "state", nullable = false)
     private String state;
 
-    @Lob
-    @Column(name = "s3_location", nullable = false)
+    @Column(name = "s3_location", nullable = false,length = 1000)
     private String s3Location;
 
-    @Lob
-    @Column(name = "result_json_schema", nullable = false)
+    @Column(name = "result_json_schema", nullable = false,length = 500000)
     private String jsonSchema;
 
-    @Lob
-    @Column(name = "function_description")
+    @Column(name = "function_description",length = 1000)
     private String functionDescription;
 
-    @Lob
-    @Column(name = "handler",nullable = false)
+    @Column(name = "handler",nullable = false,length = 1000)
     private String handler;
 
-    @Lob
-    @Column(name = "runtime",nullable = false)
+    @Column(name = "runtime",nullable = false,length = 1000)
     private String runtime;
 
     @Column(name = "created", nullable = false, updatable = false)

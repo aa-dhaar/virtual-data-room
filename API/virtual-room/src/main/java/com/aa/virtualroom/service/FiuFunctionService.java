@@ -77,7 +77,7 @@ public class FiuFunctionService {
             }
 
             //create the object before insert
-            functionDetails.setS3Location(BUCKET_NAME+"/"+functionDetails.getFiuId().toString()+"/"+fileName);
+            functionDetails.setS3Location(functionDetails.getFiuId().toString()+"/"+fileName);
             functionDetails.setState(FunctionState.PENDING.name());
             fiuFunctionRepo.save(functionDetails);
             uploadToS3(targetLocation.toFile(),functionDetails.getFiuId().toString(), fileName);

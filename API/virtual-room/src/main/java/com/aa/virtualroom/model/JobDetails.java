@@ -60,16 +60,13 @@ public class JobDetails {
     @Column(name = "retry_count", nullable = false)
     private int retry;
 
-    @Lob
-    @Column(name = "aa_id", nullable = false)
+    @Column(name = "aa_id", nullable = false,length = 1000)
     private String aaId;
 
-    @Lob
-    @Column(name = "request_params")
+    @Column(name = "request_params",length = 1000)
     private String requestParams;
 
-    @Lob
-    @Column(name = "result")
+    @Column(name = "result",length = 1000)
     private String result;
 
     @Column(name = "created", nullable = false, updatable = false)

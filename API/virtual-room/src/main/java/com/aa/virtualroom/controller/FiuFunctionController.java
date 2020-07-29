@@ -7,6 +7,8 @@ import com.aa.virtualroom.response.FunctionDetailsResponse;
 import com.aa.virtualroom.response.FunctionIdResponse;
 import com.aa.virtualroom.response.FunctionResponse;
 import com.aa.virtualroom.service.FiuFunctionService;
+import com.aa.virtualroom.validator.JsonSchemaValidator;
+
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,6 +38,7 @@ public class FiuFunctionController {
                                             @RequestParam("runtime") String runtime,
                                             @RequestParam("functionName") String functionName,
                                             @RequestParam(required = false) String functionDescription) {
+    	JsonSchemaValidator.validation(jsonSchema);
         FunctionDetails functionDetails = new FunctionDetails();
         functionDetails.setFiuId(fiuId);
         functionDetails.setJsonSchema(jsonSchema);
