@@ -51,24 +51,30 @@ public class FunctionDetails {
     @Column(name = "fiu_id", updatable = false, nullable = false)
     private UUID fiuId;
 
+    @Lob
     @Column(name = "function_name", nullable = false)
     private String functionName;
 
     @Column(name = "state", nullable = false)
     private String state;
 
+    @Lob
     @Column(name = "s3_location", nullable = false)
     private String s3Location;
 
+    @Lob
     @Column(name = "result_json_schema", nullable = false)
     private String jsonSchema;
-    
+
+    @Lob
     @Column(name = "function_description")
     private String functionDescription;
-    
+
+    @Lob
     @Column(name = "handler",nullable = false)
     private String handler;
-    
+
+    @Lob
     @Column(name = "runtime",nullable = false)
     private String runtime;
 
