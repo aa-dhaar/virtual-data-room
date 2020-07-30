@@ -26,6 +26,14 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.Date;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.temporal.TemporalField;
 import java.util.*;
 
 @Service
@@ -58,17 +66,14 @@ public class FiuFunctionService {
         }
     }
 
-    public String createFunction(MultipartFile file, FunctionDetails functionDetails) {
-        // Normalize file name
-        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
-        String fileName = "";
+    private void uploadFile(MultipartFile file,String fiuId,String originalFileName, String fileName) {
         try {
             // Check if the file's name contains invalid characters
             if (originalFileName.contains("..")) {
                 throw new FiuBinaryStorageException(
                     "Sorry! Filename contains invalid path sequence " + originalFileName);
             }
-            fileName = functionDetails.getFiuId() + "_" + System.currentTimeMillis() + "_" + originalFileName;
+            
             
             // Copy file to the target location (Replacing existing file with the same name)
             Path targetLocation = Paths.get(FILE_STORAGE_LOCATION).resolve(fileName);
@@ -77,17 +82,47 @@ public class FiuFunctionService {
             }
 
             //create the object before insert
-            functionDetails.setS3Location(functionDetails.getFiuId().toString()+"/"+fileName);
-            functionDetails.setState(FunctionState.PENDING.name());
-            fiuFunctionRepo.save(functionDetails);
-            uploadToS3(targetLocation.toFile(),functionDetails.getFiuId().toString(), fileName);
+            
+            uploadToS3(targetLocation.toFile(),fiuId, fileName);
             
             Files.delete(targetLocation);
             //fiuFunctionRepo.save(functionDetails);
-            return functionDetails.getFunctionId().toString();
+            
         } catch (IOException ex) {
             throw new FiuBinaryStorageException("Could not store file " + fileName + ". Please try again!", ex);
         }
+    }
+    
+    public String createFunction(MultipartFile file, FunctionDetails functionDetails) {
+        // Normalize file name
+        String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
+        String fiuId = functionDetails.getFiuId().toString();
+        String fileName = fiuId + "_" + System.currentTimeMillis() + "_" + originalFileName;
+        functionDetails.setS3Location(fileName);
+        functionDetails.setState(FunctionState.PENDING.name());
+        fiuFunctionRepo.save(functionDetails);
+        uploadFile(file, fiuId, originalFileName, fileName);
+        return functionDetails.getFunctionId().toString();
+       
+    }
+    
+    public FunctionDetails UpdateFunction(MultipartFile file, FunctionDetails functionDetails) throws RecordNotFoundException, ParseException {
+    	
+    	if(file!=null && !file.isEmpty()) {
+    		createFunction(file, functionDetails);
+    	}
+    	else {
+    		FunctionDetails existingFunctionDetails = getFunctionDetails(functionDetails.getFunctionId().toString());
+    		if(existingFunctionDetails!=null) {
+    			functionDetails.setS3Location(existingFunctionDetails.getS3Location());
+    			functionDetails.setState(existingFunctionDetails.getState().toString());
+    			functionDetails.setCreateDate(existingFunctionDetails.getCreateDate());
+    			DateFormat df = new SimpleDateFormat("YYYY-MM-DD HH:mm:ss");
+    			//functionDetails.setLastUpdateDate(new Date(System.currentTimeMillis()));
+    		}
+    		fiuFunctionRepo.save(functionDetails);
+    	}
+    	return functionDetails;
     }
 
     public FunctionDetails getFunctionDetails(String functionId) throws RecordNotFoundException {

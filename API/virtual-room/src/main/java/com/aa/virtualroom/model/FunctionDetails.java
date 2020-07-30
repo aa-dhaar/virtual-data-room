@@ -76,7 +76,7 @@ public class FunctionDetails {
     @CreationTimestamp
     private Date createDate;
 
-    @Column(name = "last_updated", nullable = false, updatable = false)
+    @Column(name = "last_updated", nullable = false)
     @UpdateTimestamp
     private Date lastUpdateDate;
 

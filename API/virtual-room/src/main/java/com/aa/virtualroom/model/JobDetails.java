@@ -66,7 +66,7 @@ public class JobDetails {
     @Column(name = "request_params",length = 1000)
     private String requestParams;
 
-    @Column(name = "result",length = 1000)
+    @Column(name = "result",length = 500000)
     private String result;
 
     @Column(name = "created", nullable = false, updatable = false)

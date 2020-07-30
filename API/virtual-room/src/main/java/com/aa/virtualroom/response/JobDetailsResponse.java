@@ -1,6 +1,5 @@
 package com.aa.virtualroom.response;
 
-import java.util.Date;
 
 public final class JobDetailsResponse {
 
@@ -8,10 +7,11 @@ public final class JobDetailsResponse {
 	private final String functionId;
 	private final String aaId;
 	private final String state;
-	private final Date created;
-	private final Date lastUpdated;
-	public JobDetailsResponse(String jobId, String functionId, String aaId, String state, Date created,
-			Date lastUpdated) {
+	private final String created;
+	private final String lastUpdated;
+	private final String result;
+	public JobDetailsResponse(String jobId, String functionId, String aaId, String state, String created,
+			String lastUpdated,String result) {
 		super();
 		this.jobId = jobId;
 		this.functionId = functionId;
@@ -19,6 +19,7 @@ public final class JobDetailsResponse {
 		this.state = state;
 		this.created = created;
 		this.lastUpdated = lastUpdated;
+		this.result = result;
 	}
 	public String getJobId() {
 		return jobId;
@@ -32,11 +33,14 @@ public final class JobDetailsResponse {
 	public String getState() {
 		return state;
 	}
-	public Date getCreated() {
+	public String getCreated() {
 		return created;
 	}
-	public Date getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
+	}
+	public String getResult() {
+		return result;
 	}
 	
 	

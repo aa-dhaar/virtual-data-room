@@ -10,6 +10,9 @@ public class JsonSchemaValidator {
 
 	public static boolean validation(String jsonSchema) {
 		JsonObject convertedObject = new Gson().fromJson(jsonSchema, JsonObject.class);
+		if(convertedObject==null || convertedObject.isJsonNull()) {
+			throw new UnsupportedOperationException("Json schema can't be blank or null");
+		}
 		if(convertedObject.has("$schema") && convertedObject.has("$id")) {
 			if(!isVaild(convertedObject))
 				throw new UnsupportedOperationException("The Jsonschema format is not valid");
@@ -20,7 +23,7 @@ public class JsonSchemaValidator {
 	private static boolean isVaild(JsonObject convertedObject) {
 
 		if(convertedObject.has("type")) {
-			if(convertedObject.get("type").getAsString().equals("object") && !convertedObject.get("additionalProperties").getAsBoolean() && convertedObject.has("properties")) {
+			if(convertedObject.get("type").getAsString().equals("object") && convertedObject.has("additionalProperties")  && !convertedObject.get("additionalProperties").getAsBoolean() && convertedObject.has("properties")) {
 				return isVaild(convertedObject.get("properties").getAsJsonObject());
 			}
 		}
@@ -28,7 +31,7 @@ public class JsonSchemaValidator {
 			return validateTypeNotObject(convertedObject);
 		}
 
-		return true; 
+		return false; 
 	}
 
 	private static boolean validateTypeNotObject(JsonObject convertedObject) {
@@ -37,10 +40,10 @@ public class JsonSchemaValidator {
 
 		for (String keyElement : listOfJson) {
 			JsonObject valueElement = convertedObject.getAsJsonObject().getAsJsonObject(keyElement);
-			if(valueElement.get("type").getAsString().equals("object") && !valueElement.get("additionalProperties").getAsBoolean() && valueElement.has("properties")) {
+			if(valueElement.has("type") && valueElement.get("type").getAsString().equals("object") && valueElement.has("additionalProperties") && !valueElement.get("additionalProperties").getAsBoolean() && valueElement.has("properties")) {
 				return isVaild(convertedObject.get("properties").getAsJsonObject());
 			}
-			else if(valueElement.get("type").getAsString().equals("boolean") || valueElement.get("type").getAsString().equals("string") && valueElement.has("enum")) {
+			else if((valueElement.has("type") && valueElement.get("type").getAsString().equals("boolean")) || (valueElement.has("type") && valueElement.get("type").getAsString().equals("string") && valueElement.has("enum"))) {
 				continue;
 			}
 			else

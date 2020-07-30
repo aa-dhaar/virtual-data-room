@@ -7,12 +7,12 @@ public final class FunctionDetailsResponse {
 	private final String functionId;
 	private final String jsonSchema;
 	private final String state;
-	private final Date created;
-	private final Date lastUpdated;
+	private final String created;
+	private final String lastUpdated;
 	private final String functionName;
 	private final String handler;
 	private final String runtime;
-	public FunctionDetailsResponse(String functionId, String jsonSchema, String state, Date created, Date lastUpdated,
+	public FunctionDetailsResponse(String functionId, String jsonSchema, String state, String created, String lastUpdated,
 			 String functionName, String handler, String runtime) {
 		super();
 		this.functionId = functionId;
@@ -33,10 +33,10 @@ public final class FunctionDetailsResponse {
 	public String getState() {
 		return state;
 	}
-	public Date getCreated() {
+	public String getCreated() {
 		return created;
 	}
-	public Date getLastUpdated() {
+	public String getLastUpdated() {
 		return lastUpdated;
 	}
 	

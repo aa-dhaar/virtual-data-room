@@ -56,27 +56,25 @@ public class FiuJobController {
 
 	@GetMapping("/getJobDetails")
 	public ResponseEntity<?> getJobDetails(@RequestParam("jobId") String jobId) {
-		try {
 			JobDetails jobDetails = fiuJobService.getJobDetails(jobId);
-			JobDetailsResponse jobDetailsResponse = new JobDetailsResponse(jobId, jobDetails.getFunctionId().toString(), jobDetails.getAaId(), jobDetails.getState(), jobDetails.getCreateDate(), jobDetails.getLastUpdateDate());
+			JobDetailsResponse jobDetailsResponse = new JobDetailsResponse(jobId, jobDetails.getFunctionId().toString(), jobDetails.getAaId(), jobDetails.getState(), jobDetails.getCreateDate().toString(), jobDetails.getLastUpdateDate().toString(),jobDetails.getResult());
 			Map<String, JobDetailsResponse> jobs = new HashMap<String, JobDetailsResponse>();
-			jobs.put(jobDetails.getFiuId().toString(), jobDetailsResponse);
+			jobs.put(jobDetails.getJobId().toString(), jobDetailsResponse);
 			JobResponse jobResponse = new JobResponse(jobDetails.getFiuId().toString(), jobs);
 			return ResponseEntity.status(HttpStatus.OK).body(jobResponse);
-		} catch (RecordNotFoundException e) {
-			LOGGER.error(e.getMessage());
-			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-					.body(new ErrorResponse(e.getMessage()));
-		}
+		
 	}
 
 	@GetMapping("/getJobsByFiuId")
 	public ResponseEntity<?> getJobsByFiuId(@RequestParam("fiuId") String fiuId) {
 		List<JobDetails> listOfJobs = fiuJobService.getJobs(fiuId);
+		if(listOfJobs.isEmpty()) {
+			throw new RecordNotFoundException("Could not find fiuId=" + fiuId);
+		}
 		Map<String, JobDetailsResponse> jobs = new HashMap<String, JobDetailsResponse>();
 
 		for (JobDetails jobDetails : listOfJobs) {
-			JobDetailsResponse jobDetailsResponse = new JobDetailsResponse(jobDetails.getJobId().toString(), jobDetails.getFunctionId().toString(), jobDetails.getAaId(), jobDetails.getState(), jobDetails.getCreateDate(), jobDetails.getLastUpdateDate());
+			JobDetailsResponse jobDetailsResponse = new JobDetailsResponse(jobDetails.getJobId().toString(), jobDetails.getFunctionId().toString(), jobDetails.getAaId(), jobDetails.getState(), jobDetails.getCreateDate().toString(), jobDetails.getLastUpdateDate().toString(),jobDetails.getResult());
 			jobs.put(jobDetails.getJobId().toString(), jobDetailsResponse);
 		}
 		JobResponse jobResponse = new JobResponse(fiuId, jobs);
