@@ -214,6 +214,9 @@ Resources:
                   # Allow the ECS tasks to upload logs to CloudWatch
                   - 'logs:CreateLogStream'
                   - 'logs:PutLogEvents'
+
+                  # Secrets
+                  - 'secretsmanager:GetSecretValue'
                 Resource: '*'
 
   PrivateSubnetOne:

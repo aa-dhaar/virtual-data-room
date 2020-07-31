@@ -8,23 +8,18 @@ import com.aa.virtualroom.response.FunctionIdResponse;
 import com.aa.virtualroom.response.FunctionResponse;
 import com.aa.virtualroom.service.FiuFunctionService;
 import com.aa.virtualroom.validator.JsonSchemaValidator;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.joda.time.Chronology;
-import org.joda.time.DateTime;
-import org.joda.time.chrono.CopticChronology;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.text.ParseException;
+import java.io.InvalidObjectException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/vdr")
@@ -36,90 +31,116 @@ public class FiuFunctionController {
     private FiuFunctionService fiuFunctionService;
 
     @PostMapping("/createFunction")
-    public ResponseEntity<?> createFunction(@RequestParam("function") MultipartFile file,
+    public ResponseEntity<?> createFunction(@RequestParam("function") MultipartFile functionFile,
                                             @RequestParam("fiuId") String fiuId,
                                             @RequestParam("jsonSchema") String jsonSchema,
                                             @RequestParam("handler") String handler,
                                             @RequestParam("runtime") String runtime,
                                             @RequestParam("functionName") String functionName,
                                             @RequestParam(required = false) String functionDescription) {
-    	JsonSchemaValidator.validation(jsonSchema);
-        FunctionDetails functionDetails = new FunctionDetails();
-        functionDetails.setFiuId(fiuId);
-        functionDetails.setJsonSchema(jsonSchema);
-        functionDetails.setFunctionDescription(functionDescription);
-        functionDetails.setRuntime(runtime);
-        functionDetails.setHandler(handler);
-        functionDetails.setFunctionName(functionName);
-        //TODO: validate JsonSchema
-        FunctionIdResponse functionIdResponse =
-            new FunctionIdResponse(fiuFunctionService.createFunction(file, functionDetails));
-		    /*
-		    String fileDownloadUri = ServletUriComponentsBuilder.fromCurrentContextPath()
-				.path("/downloadFile/")
-				.path(fileName)
-				.toUriString();
-			*/
-        return ResponseEntity.status(HttpStatus.ACCEPTED)
-            .body(functionIdResponse);
+        try {
+            JsonSchemaValidator.validate(jsonSchema);
+            FunctionDetails functionDetails = new FunctionDetails();
+            functionDetails.setFiuId(fiuId);
+            functionDetails.setJsonSchema(jsonSchema);
+            functionDetails.setFunctionDescription(functionDescription);
+            functionDetails.setRuntime(runtime);
+            functionDetails.setHandler(handler);
+            functionDetails.setFunctionName(functionName);
+            FunctionIdResponse functionIdResponse =
+                new FunctionIdResponse(fiuFunctionService.createFunction(functionFile, functionDetails));
+            return ResponseEntity.status(HttpStatus.ACCEPTED)
+                .body(functionIdResponse);
+        } catch (InvalidObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+        }
     }
-    
+
     @PutMapping("/updateFunction/{functionId}")
-    public ResponseEntity<?> updateFunction(
-    		@PathVariable String functionId,
-    		@RequestParam(required = false) MultipartFile function,
+    public ResponseEntity<?> updateFunction(@PathVariable String functionId,
+                                            @RequestParam("function") MultipartFile functionFile,
                                             @RequestParam("fiuId") String fiuId,
                                             @RequestParam("jsonSchema") String jsonSchema,
                                             @RequestParam("handler") String handler,
                                             @RequestParam("runtime") String runtime,
                                             @RequestParam("functionName") String functionName,
-                                            @RequestParam(required = false) String functionDescription
-                                            ) throws RecordNotFoundException, ParseException {
-    	JsonSchemaValidator.validation(jsonSchema);
-        FunctionDetails functionDetails = new FunctionDetails();
-        functionDetails.setFunctionId(UUID.fromString(functionId));
-        functionDetails.setFiuId(fiuId);
-        functionDetails.setJsonSchema(jsonSchema);
-        functionDetails.setFunctionDescription(functionDescription);
-        functionDetails.setRuntime(runtime);
-        functionDetails.setHandler(handler);
-        functionDetails.setFunctionName(functionName);
-        //TODO: validate JsonSchema
-        fiuFunctionService.UpdateFunction(function, functionDetails);
-        FunctionDetailsResponse functionDetailsResponse = new FunctionDetailsResponse(functionId, functionDetails.getJsonSchema(), functionDetails.getState().toString(),functionDetails.getCreateDate().toString(), java.time.LocalDateTime.now().toString(),  functionDetails.getFunctionName(), functionDetails.getHandler(), functionDetails.getRuntime());
-        Map<String, FunctionDetailsResponse> functions = new HashMap<String, FunctionDetailsResponse>();
-        functions.put(functionId, functionDetailsResponse);
-        FunctionResponse functionResponse = new FunctionResponse(functionDetails.getFiuId().toString(), functions);
-        
-        return ResponseEntity.status(HttpStatus.OK)
-            .body(functionResponse);
+                                            @RequestParam(required = false) String functionDescription) {
+
+        try {
+            JsonSchemaValidator.validate(jsonSchema);
+            FunctionDetails functionDetails = fiuFunctionService.getFunctionDetails(functionId);
+            if (functionDetails != null) {
+                FunctionDetails updatedFunctionDetails = new FunctionDetails();
+                updatedFunctionDetails.setFiuId(fiuId);
+                updatedFunctionDetails.setJsonSchema(jsonSchema);
+                updatedFunctionDetails.setFunctionDescription(functionDescription);
+                updatedFunctionDetails.setRuntime(runtime);
+                updatedFunctionDetails.setHandler(handler);
+                updatedFunctionDetails.setFunctionName(functionName);
+                updatedFunctionDetails.setFunctionId(functionId);
+                FunctionIdResponse functionIdResponse =
+                    new FunctionIdResponse(fiuFunctionService.createFunction(functionFile, updatedFunctionDetails));
+                return ResponseEntity.status(HttpStatus.ACCEPTED)
+                    .body(functionIdResponse);
+            } else {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(new ErrorResponse("Could not find FunctionId=" + functionId));
+            }
+        } catch (RecordNotFoundException e) {
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+        } catch (InvalidObjectException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                .body(new ErrorResponse(e.getMessage()));
+        }
+
     }
 
     @GetMapping("/getFunctionDetails")
     public ResponseEntity<?> getFunctionDetails(@RequestParam("functionId") String functionId) {
+        try {
             FunctionDetails functionDetails = fiuFunctionService.getFunctionDetails(functionId);
-            ;
-            FunctionDetailsResponse functionDetailsResponse = new FunctionDetailsResponse(functionId, functionDetails.getJsonSchema(), functionDetails.getState().toString(),functionDetails.getCreateDate().toString(), functionDetails.getLastUpdateDate().toString(),  functionDetails.getFunctionName(), functionDetails.getHandler(), functionDetails.getRuntime());
+            FunctionDetailsResponse
+                functionDetailsResponse =
+                new FunctionDetailsResponse(functionId, functionDetails.getJsonSchema(),
+                                            functionDetails.getState().toString(),
+                                            functionDetails.getCreateDate().toString(),
+                                            functionDetails.getLastUpdateDate().toString(),
+                                            functionDetails.getFunctionName(), functionDetails.getFunctionDescription(),
+                                            functionDetails.getHandler(),
+                                            functionDetails.getRuntime());
             Map<String, FunctionDetailsResponse> functions = new HashMap<String, FunctionDetailsResponse>();
             functions.put(functionId, functionDetailsResponse);
             FunctionResponse functionResponse = new FunctionResponse(functionDetails.getFiuId().toString(), functions);
-            
             return ResponseEntity.status(HttpStatus.OK)
                 .body(functionResponse);
-       
+        } catch (RecordNotFoundException e) {
+            LOGGER.error(e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                .body(new ErrorResponse(e.getMessage()));
+        }
     }
 
     @GetMapping("/getFunctionsByFiuId")
     public ResponseEntity<?> getFunctionsByFiuId(@RequestParam("fiuId") String fiuId) {
         List<FunctionDetails> listOfFunctions = fiuFunctionService.getFunctions(fiuId);
-        Map<String, FunctionDetailsResponse> functions = new HashMap<String, FunctionDetailsResponse>();
-        if(listOfFunctions.isEmpty()) {
-        	 throw new RecordNotFoundException("Could not find fiuId=" + fiuId);
-        }
+        Map<String, FunctionDetailsResponse> functions = new HashMap<>();
         for (FunctionDetails functionDetails : listOfFunctions) {
-            FunctionDetailsResponse functionDetailsResponse = new FunctionDetailsResponse(functionDetails.getFunctionId().toString(), functionDetails.getJsonSchema(), functionDetails.getState().toString(), functionDetails.getCreateDate().toString(), functionDetails.getLastUpdateDate().toString(),  functionDetails.getFunctionName(), functionDetails.getHandler(), functionDetails.getRuntime());
-			functions.put(functionDetails.getFunctionId().toString(), functionDetailsResponse);
-		}
+            FunctionDetailsResponse
+                functionDetailsResponse =
+                new FunctionDetailsResponse(functionDetails.getFunctionId().toString(),
+                                            functionDetails.getJsonSchema(),
+                                            functionDetails.getState().toString(),
+                                            functionDetails.getCreateDate().toString(),
+                                            functionDetails.getLastUpdateDate().toString(),
+                                            functionDetails.getFunctionName(),
+                                            functionDetails.getFunctionDescription(),
+                                            functionDetails.getHandler(),
+                                            functionDetails.getRuntime());
+            functions.put(functionDetails.getFunctionId().toString(), functionDetailsResponse);
+        }
         FunctionResponse functionResponse = new FunctionResponse(fiuId, functions);
         return ResponseEntity.status(HttpStatus.OK).body(functionResponse);
     }

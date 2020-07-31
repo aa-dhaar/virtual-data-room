@@ -23,6 +23,15 @@ Parameters:
   ImageUrl:
     Type: String
     Description: The url of a docker image that will handle incoming traffic.
+  DockerRegistryKeyName:
+    Type: String
+    Description: The docker registry key name to reference in secrets manager.
+  DockerRegistryKey:
+    Type: String
+    Description: The docker registry key.
+  DockerRegistryUsername:
+    Type: String
+    Description: The docker registry username.
   ContainerPort:
     Type: Number
     Default: 80
@@ -47,6 +56,12 @@ Parameters:
     Description: How many copies of the service task to run.
 
 Resources:
+
+  DockerRegistrySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: !Ref 'DockerRegistryKeyName'
+      SecretString: !Join ['', ['{"username": "', !Ref 'DockerRegistryUsername' ,'", "password": "', !Ref 'DockerRegistryKey','"}']]
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -87,6 +102,7 @@ Resources:
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
+    DependsOn: DockerRegistrySecret
     Properties:
       Family: !Ref 'ServiceName'
       Cpu: !Ref 'ContainerCpu'
@@ -102,6 +118,8 @@ Resources:
           Cpu: !Ref 'ContainerCpu'
           Memory: !Ref 'ContainerMemory'
           Image: !Ref 'ImageUrl'
+          RepositoryCredentials:
+            CredentialsParameter: !Ref 'DockerRegistrySecret'
           Environment:
             - Name: SPRING_DATASOURCE_URL
               Value: !Join

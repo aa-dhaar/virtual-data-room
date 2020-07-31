@@ -51,25 +51,25 @@ public class FunctionDetails {
     @Column(name = "fiu_id", updatable = false, nullable = false)
     private UUID fiuId;
 
-    @Column(name = "function_name", nullable = false,length = 1000)
+    @Column(name = "function_name", nullable = false, length = 10485760)
     private String functionName;
 
     @Column(name = "state", nullable = false)
     private String state;
 
-    @Column(name = "s3_location", nullable = false,length = 1000)
+    @Column(name = "s3_location", nullable = false, length = 10485760)
     private String s3Location;
 
-    @Column(name = "result_json_schema", nullable = false,length = 500000)
+    @Column(name = "result_json_schema", nullable = false, length = 10485760)
     private String jsonSchema;
 
-    @Column(name = "function_description",length = 1000)
+    @Column(name = "function_description", length = 10485760)
     private String functionDescription;
 
-    @Column(name = "handler",nullable = false,length = 1000)
+    @Column(name = "handler", nullable = false, length = 10485760)
     private String handler;
 
-    @Column(name = "runtime",nullable = false,length = 1000)
+    @Column(name = "runtime", nullable = false, length = 10485760)
     private String runtime;
 
     @Column(name = "created", nullable = false, updatable = false)
@@ -82,6 +82,10 @@ public class FunctionDetails {
 
     public UUID getFunctionId() {
         return functionId;
+    }
+
+    public void setFunctionId(String functionId) {
+        this.functionId = UUID.fromString(functionId);
     }
 
     public void setFunctionId(UUID functionId) {
@@ -144,33 +148,37 @@ public class FunctionDetails {
         this.functionName = functionName;
     }
 
-	public String getFunctionDescription() {
-		return functionDescription;
-	}
+    public String getFunctionDescription() {
+        return functionDescription;
+    }
 
-	public void setFunctionDescription(String functionDescription) {
-		this.functionDescription = functionDescription;
-	}
+    public void setFunctionDescription(String functionDescription) {
+        if (functionDescription == null) {
+            this.functionDescription = "";
+        } else {
+            this.functionDescription = functionDescription;
+        }
+    }
 
-	public String getHandler() {
-		return handler;
-	}
+    public String getHandler() {
+        return handler;
+    }
 
-	public void setHandler(String handler) {
-		this.handler = handler;
-	}
+    public void setHandler(String handler) {
+        this.handler = handler;
+    }
 
-	public String getRuntime() {
-		return runtime;
-	}
+    public String getRuntime() {
+        return runtime;
+    }
 
-	public void setRuntime(String runtime) {
-		this.runtime = runtime;
-	}
+    public void setRuntime(String runtime) {
+        this.runtime = runtime;
+    }
 
-	public void setFiuId(UUID fiuId) {
-		this.fiuId = fiuId;
-	}
+    public void setFiuId(UUID fiuId) {
+        this.fiuId = fiuId;
+    }
 
-    
+
 }
