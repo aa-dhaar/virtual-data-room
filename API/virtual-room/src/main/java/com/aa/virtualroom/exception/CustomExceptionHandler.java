@@ -1,8 +1,6 @@
 package com.aa.virtualroom.exception;
 
-import java.util.ArrayList;
-import java.util.List;
-
+import com.aa.virtualroom.response.ErrorResponse;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.http.HttpStatus;
@@ -12,7 +10,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-import com.aa.virtualroom.response.ErrorResponse;
+import java.util.ArrayList;
+import java.util.List;
 
 @SuppressWarnings({"unchecked","rawtypes"})
 @ControllerAdvice

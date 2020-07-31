@@ -85,8 +85,8 @@ public class FiuFunctionService {
         // Normalize file name
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fiuId = functionDetails.getFiuId().toString();
-        String functionId = functionDetails.getFunctionId().toString();
-        String fileName = functionId + "_" + System.currentTimeMillis() + "_" + originalFileName;
+        String functionName = functionDetails.getFunctionName();
+        String fileName = functionName + "_" + System.currentTimeMillis() + "_" + originalFileName;
         functionDetails.setS3Location(fileName);
         functionDetails.setState(FunctionState.PENDING.name());
         fiuFunctionRepo.save(functionDetails);
