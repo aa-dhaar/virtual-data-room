@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: '2010-09-09'
+
+Description: Provision the required resources for your blog post example 'Add domain filtering to
+  your NAT instance with Squid'. Wait for the creation to complete before testing.
+
+Parameters:
+
+  NetworkStackName:
+    Type: String
+    Description: The name of the networking stack that this stack will build upon.
+
+  AmiId:
+    Type: 'AWS::SSM::Parameter::Value<AWS::EC2::Image::Id>'
+    Default: '/aws/service/ami-amazon-linux-latest/amzn2-ami-hvm-x86_64-gp2'
+    Description: AMI ID pointer in AWS Systems Manager Parameter Store. Default value points to the
+      latest Amazon Linux 2 AMI ID.
+
+Resources:
+
+  TestingInstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+            Action:
+              - sts:AssumeRole
+      Path: /
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/service-role/AmazonEC2RoleforSSM
+      Policies:
+        - PolicyName: root
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ec2:DescribeRegions
+                Resource: '*'
+
+  TestingInstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref TestingInstanceRole
+      Path: /
+
+  TestingInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      IamInstanceProfile: !Ref TestingInstanceProfile
+      ImageId: !Ref AmiId
+      InstanceType: t2.micro
+      SubnetId:
+        Fn::ImportValue:
+          !Join [':', [!Ref 'NetworkStackName', 'PrivateSubnetOne']]
+      Tags:
+        - Key: Name
+          Value: !Sub 'Testing Instance - ${AWS::StackName}'

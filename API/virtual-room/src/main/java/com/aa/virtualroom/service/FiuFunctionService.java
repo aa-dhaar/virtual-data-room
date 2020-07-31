@@ -12,7 +12,6 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
@@ -36,11 +35,8 @@ public class FiuFunctionService {
     @Autowired
     FiuFunctionRepo fiuFunctionRepo;
 
-    @Value("${aws.s3.access-key}")
-    private String accessKeyID;
-
-    @Value("${aws.s3.secret-access-key}")
-    private String secretAccessKey;
+    private final String accessKeyID;
+    private final String secretAccessKey;
 
     @Autowired
     public FiuFunctionService() {
@@ -55,6 +51,8 @@ public class FiuFunctionService {
         } else {
             System.out.println(directory.toPath());
         }
+        this.accessKeyID = System.getenv("AWS_ACCESS_KEY_ID");
+        this.secretAccessKey = System.getenv("AWS_SECRET_ACCESS_KEY");
     }
 
     private void uploadFile(MultipartFile file, String fiuId, String originalFileName, String fileName) {
@@ -87,7 +85,8 @@ public class FiuFunctionService {
         // Normalize file name
         String originalFileName = StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         String fiuId = functionDetails.getFiuId().toString();
-        String fileName = fiuId + "_" + System.currentTimeMillis() + "_" + originalFileName;
+        String functionId = functionDetails.getFunctionId().toString();
+        String fileName = functionId + "_" + System.currentTimeMillis() + "_" + originalFileName;
         functionDetails.setS3Location(fileName);
         functionDetails.setState(FunctionState.PENDING.name());
         fiuFunctionRepo.save(functionDetails);
@@ -128,7 +127,7 @@ public class FiuFunctionService {
         return functionDetails.orElse(Collections.emptyList());
     }
 
-    private String uploadToS3(File fileName, String fiuId, String originalFileName) {
+    private String uploadToS3(File file, String fiuId, String originalFileName) {
         AWSCredentials credentials = new BasicAWSCredentials(accessKeyID, secretAccessKey);
         AmazonS3 s3client = AmazonS3ClientBuilder
             .standard()
@@ -143,7 +142,7 @@ public class FiuFunctionService {
         s3client.putObject(
             BUCKET_NAME,
             s3FileName,
-            fileName
+            file
         );
 
         return s3FileName;

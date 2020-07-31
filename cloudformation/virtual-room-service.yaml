@@ -32,6 +32,12 @@ Parameters:
   DockerRegistryUsername:
     Type: String
     Description: The docker registry username.
+  AWSAccessKeyId:
+    Type: String
+    Description: The AWS headless access key id.
+  AWSSecretAccessKey:
+    Type: String
+    Description: The AWS headless secret access key.
   ContainerPort:
     Type: Number
     Default: 80
@@ -62,6 +68,18 @@ Resources:
     Properties:
       Name: !Ref 'DockerRegistryKeyName'
       SecretString: !Join ['', ['{"username": "', !Ref 'DockerRegistryUsername' ,'", "password": "', !Ref 'DockerRegistryKey','"}']]
+
+  AWSAccessKeyIdSecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: "AWSAccessKeyId"
+      SecretString: !Join ['', ['{"key": "', !Ref 'AWSAccessKeyId','"}']]
+
+  AWSSecretAccessKeySecret:
+    Type: "AWS::SecretsManager::Secret"
+    Properties:
+      Name: "AWSSecretAccessKey"
+      SecretString: !Join ['', ['{"key": "', !Ref 'AWSSecretAccessKey','"}']]
 
   TargetGroup:
     Type: AWS::ElasticLoadBalancingV2::TargetGroup
@@ -102,7 +120,10 @@ Resources:
 
   TaskDefinition:
     Type: AWS::ECS::TaskDefinition
-    DependsOn: DockerRegistrySecret
+    DependsOn:
+      - DockerRegistrySecret
+      - AWSAccessKeyIdSecret
+      - AWSSecretAccessKeySecret
     Properties:
       Family: !Ref 'ServiceName'
       Cpu: !Ref 'ContainerCpu'
@@ -142,6 +163,18 @@ Resources:
                 - - '{{resolve:secretsmanager:'
                   - Fn::ImportValue: !Join [':', [!Ref 'DatabaseStackName', 'Secret']]
                   - ':SecretString:password}}'
+            - Name: AWS_ACCESS_KEY_ID
+              Value: !Join
+                - ''
+                - - '{{resolve:secretsmanager:'
+                  - !Ref AWSAccessKeyIdSecret
+                  - ':SecretString:key}}'
+            - Name: AWS_SECRET_ACCESS_KEY
+              Value: !Join
+                - ''
+                - - '{{resolve:secretsmanager:'
+                  - !Ref AWSSecretAccessKeySecret
+                  - ':SecretString:key}}'
           PortMappings:
             - ContainerPort: !Ref 'ContainerPort'
           LogConfiguration:
