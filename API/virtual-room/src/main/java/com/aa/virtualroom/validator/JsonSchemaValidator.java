@@ -18,6 +18,9 @@ public class JsonSchemaValidator {
                 throw new InvalidObjectException("The JsonSchema format is not valid");
             }
         }
+		else {
+        	throw new InvalidObjectException("The JsonSchema format is not valid");
+        }
         return true;
     }
 

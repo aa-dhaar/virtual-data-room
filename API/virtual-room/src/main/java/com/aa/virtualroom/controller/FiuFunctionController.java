@@ -15,6 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.google.gson.JsonParseException;
 
 import java.io.InvalidObjectException;
 import java.util.HashMap;
@@ -55,6 +56,10 @@ public class FiuFunctionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
         }
+		catch (JsonParseException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	            .body(new ErrorResponse("Invalid Jsonschema"));
+	    }
     }
 
     @PutMapping("/updateFunction/{functionId}")
@@ -95,6 +100,10 @@ public class FiuFunctionController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .body(new ErrorResponse(e.getMessage()));
         }
+		catch (JsonParseException e) {
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+	            .body(new ErrorResponse("Invalid Jsonschema"));
+	    }
 
     }
 
@@ -121,6 +130,7 @@ public class FiuFunctionController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                 .body(new ErrorResponse(e.getMessage()));
         }
+		
     }
 
     @GetMapping("/getFunctionsByFiuId")
