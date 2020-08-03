@@ -10,9 +10,10 @@ public final class JobDetailsResponse {
     private final String created;
     private final String lastUpdated;
     private final String result;
+    private final String functionName;
 
     public JobDetailsResponse(String jobId, String functionId, String aaId, String state, String created,
-                              String lastUpdated, String result) {
+                              String lastUpdated, String result,String functionName) {
         super();
         this.jobId = jobId;
         this.functionId = functionId;
@@ -21,6 +22,7 @@ public final class JobDetailsResponse {
         this.created = created;
         this.lastUpdated = lastUpdated;
         this.result = result;
+        this.functionName = functionName;
     }
 
     public String getJobId() {
@@ -50,6 +52,10 @@ public final class JobDetailsResponse {
     public String getResult() {
         return result;
     }
+
+	public String getFunctionName() {
+		return functionName;
+	}
 
 
 }
