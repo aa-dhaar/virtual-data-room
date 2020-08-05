@@ -7,13 +7,13 @@ public final class JobDetailsResponse {
     private final String functionId;
     private final String aaId;
     private final String state;
-    private final String created;
-    private final String lastUpdated;
+    private final long created;
+    private final long lastUpdated;
     private final String result;
     private final String functionName;
 
-    public JobDetailsResponse(String jobId, String functionId, String aaId, String state, String created,
-                              String lastUpdated, String result,String functionName) {
+    public JobDetailsResponse(String jobId, String functionId, String aaId, String state, long created,
+    		long lastUpdated, String result,String functionName) {
         super();
         this.jobId = jobId;
         this.functionId = functionId;
@@ -41,11 +41,11 @@ public final class JobDetailsResponse {
         return state;
     }
 
-    public String getCreated() {
+    public long getCreated() {
         return created;
     }
 
-    public String getLastUpdated() {
+    public long getLastUpdated() {
         return lastUpdated;
     }
 

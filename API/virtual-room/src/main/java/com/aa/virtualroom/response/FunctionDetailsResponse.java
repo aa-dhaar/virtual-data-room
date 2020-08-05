@@ -5,15 +5,15 @@ public final class FunctionDetailsResponse {
     private final String functionId;
     private final String jsonSchema;
     private final String state;
-    private final String created;
-    private final String lastUpdated;
+    private final long created;
+    private final long lastUpdated;
     private final String functionName;
     private final String functionDescription;
     private final String handler;
     private final String runtime;
 
-    public FunctionDetailsResponse(String functionId, String jsonSchema, String state, String created,
-                                   String lastUpdated,
+    public FunctionDetailsResponse(String functionId, String jsonSchema, String state, long created,
+                                   long lastUpdated,
                                    String functionName, String functionDescription, String handler,
                                    String runtime) {
         super();
@@ -44,11 +44,11 @@ public final class FunctionDetailsResponse {
         return state;
     }
 
-    public String getCreated() {
+    public long getCreated() {
         return created;
     }
 
-    public String getLastUpdated() {
+    public long getLastUpdated() {
         return lastUpdated;
     }
 

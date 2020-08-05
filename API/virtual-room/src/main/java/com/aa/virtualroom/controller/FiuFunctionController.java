@@ -120,8 +120,8 @@ public class FiuFunctionController {
 			functionDetailsResponse =
 			new FunctionDetailsResponse(functionId, functionDetails.getJsonSchema(),
 					functionDetails.getState().toString(),
-					functionDetails.getCreateDate().toString(),
-					functionDetails.getLastUpdateDate().toString(),
+					functionDetails.getCreateDate().getTime(),
+					functionDetails.getLastUpdateDate().getTime(),
 					functionDetails.getFunctionName(), functionDetails.getFunctionDescription(),
 					functionDetails.getHandler(),
 					functionDetails.getRuntime());
@@ -148,8 +148,8 @@ public class FiuFunctionController {
 		listOfFunctions.forEach((functionDetails) -> functions.computeIfAbsent(functionDetails.getFunctionId().toString(), k -> new FunctionDetailsResponse(functionDetails.getFunctionId().toString(),
 				functionDetails.getJsonSchema(),
 				functionDetails.getState().toString(),
-				functionDetails.getCreateDate().toString(),
-				functionDetails.getLastUpdateDate().toString(),
+				functionDetails.getCreateDate().getTime(),
+				functionDetails.getLastUpdateDate().getTime(),
 				functionDetails.getFunctionName(),
 				functionDetails.getFunctionDescription(),
 				functionDetails.getHandler(),

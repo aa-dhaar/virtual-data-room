@@ -57,8 +57,8 @@ public class FiuJobController {
 			JobDetailsResponse
 			jobDetailsResponse =
 			new JobDetailsResponse(jobId, jobDetails.getFunctionId().toString(), jobDetails.getAaId(),
-					jobDetails.getState(), jobDetails.getCreateDate().toString(),
-					jobDetails.getLastUpdateDate().toString(), jobDetails.getResult(),functionName);
+					jobDetails.getState(), jobDetails.getCreateDate().getTime(),
+					jobDetails.getLastUpdateDate().getTime(), jobDetails.getResult(),functionName);
 			Map<String, JobDetailsResponse> jobs = new HashMap<>();
 			jobs.put(jobDetails.getJobId().toString(), jobDetailsResponse);
 			JobResponse jobResponse = new JobResponse(jobDetails.getFiuId().toString(), jobs);
@@ -80,7 +80,7 @@ public class FiuJobController {
 				JobDetailsResponse jobDetailsResponse =
 						new JobDetailsResponse(jobDetails.getJobId().toString(), jobDetails.getFunctionId().toString(),
 								jobDetails.getAaId(), jobDetails.getState(),
-								jobDetails.getCreateDate().toString(), jobDetails.getLastUpdateDate().toString(),
+								jobDetails.getCreateDate().getTime(), jobDetails.getLastUpdateDate().getTime(),
 								jobDetails.getResult(),functionName);
 				jobs.put(jobDetails.getJobId().toString(), jobDetailsResponse);
 			}
